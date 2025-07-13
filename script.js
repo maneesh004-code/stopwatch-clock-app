@@ -1,47 +1,43 @@
-// Clock
+// Real-time Clock
 function updateClock() {
   const now = new Date();
-  const time = now.toLocaleTimeString();
-  document.getElementById('clock').textContent = time;
+  const timeString = now.toLocaleTimeString();
+  document.getElementById("currentTime").textContent = timeString;
 }
 setInterval(updateClock, 1000);
-updateClock(); // call once initially
+updateClock();
 
-// Stopwatch
-let [hours, minutes, seconds] = [0, 0, 0];
-let stopwatchDisplay = document.getElementById("stopwatch");
-let timer = null;
+// Stopwatch Functionality
+let stopwatchInterval;
+let elapsedTime = 0;
+let running = false;
 
 function updateStopwatch() {
-  seconds++;
-  if (seconds === 60) {
-    seconds = 0;
-    minutes++;
-    if (minutes === 60) {
-      minutes = 0;
-      hours++;
-    }
-  }
-
-  let h = hours < 10 ? "0" + hours : hours;
-  let m = minutes < 10 ? "0" + minutes : minutes;
-  let s = seconds < 10 ? "0" + seconds : seconds;
-
-  stopwatchDisplay.textContent = `${h}:${m}:${s}`;
+  const hours = String(Math.floor(elapsedTime / 3600)).padStart(2, '0');
+  const minutes = String(Math.floor((elapsedTime % 3600) / 60)).padStart(2, '0');
+  const seconds = String(elapsedTime % 60).padStart(2, '0');
+  document.getElementById("stopwatch").textContent = `${hours}:${minutes}:${seconds}`;
 }
 
 function startStopwatch() {
-  if (timer !== null) return;
-  timer = setInterval(updateStopwatch, 1000);
+  if (!running) {
+    running = true;
+    stopwatchInterval = setInterval(() => {
+      elapsedTime++;
+      updateStopwatch();
+    }, 1000);
+  }
 }
 
 function stopStopwatch() {
-  clearInterval(timer);
-  timer = null;
+  running = false;
+  clearInterval(stopwatchInterval);
 }
 
 function resetStopwatch() {
   stopStopwatch();
-  [hours, minutes, seconds] = [0, 0, 0];
-  stopwatchDisplay.textContent = "00:00:00";
+  elapsedTime = 0;
+  updateStopwatch();
 }
+
+updateStopwatch();
